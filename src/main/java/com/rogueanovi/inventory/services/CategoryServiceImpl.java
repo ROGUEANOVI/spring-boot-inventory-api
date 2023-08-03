@@ -40,9 +40,9 @@ public class CategoryServiceImpl implements ICategoryService {
         CategoryResponseDto response = new CategoryResponseDto();
         List<Category> categories = new ArrayList<>();
         try {
-            Optional<Category> category = categoryDao.findById(id);
-            if (category.isPresent()){
-                categories.add(category.get());
+            Optional<Category> searchedCategory = categoryDao.findById(id);
+            if (searchedCategory.isPresent()){
+                categories.add(searchedCategory.get());
                 response.getCategoryResponseDto().setCategories(categories);
                 response.setMetadata("Ok", "200", "Successful Query");
             } else {
@@ -73,5 +73,55 @@ public class CategoryServiceImpl implements ICategoryService {
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
         return new ResponseEntity<>(response, HttpStatus.CREATED);
+    }
+
+    @Override
+    @Transactional
+    public ResponseEntity<CategoryResponseDto> editCategory(Long id, Category category) {
+        CategoryResponseDto response = new CategoryResponseDto();
+        List<Category> categories = new ArrayList<>();
+        try{
+            Optional<Category> searchedCategory = categoryDao.findById(id);
+            if (searchedCategory.isPresent()){
+                searchedCategory.get().setName(category.getName());
+                searchedCategory.get().setDescription(category.getDescription());
+
+                Category updatedCategory = categoryDao.save(searchedCategory.get());
+
+                categories.add(updatedCategory);
+                response.getCategoryResponseDto().setCategories(categories);
+                response.setMetadata("Ok", "200", "Successful Update");
+            } else {
+                response.setMetadata("Not Found", "404", "Category not found");
+                return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+            }
+
+        } catch (Exception e){
+            response.setMetadata("Error", "500", "Error updating category :" + e.getMessage());
+            e.getStackTrace();
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @Override
+    @Transactional
+    public ResponseEntity<CategoryResponseDto> deleteCategory(Long id) {
+        CategoryResponseDto response = new CategoryResponseDto();
+        try {
+            Optional<Category> searchedCategory = categoryDao.findById(id);
+            if (searchedCategory.isPresent()){
+                categoryDao.deleteById(id);
+                response.setMetadata("Ok", "200", "Successful delete");
+            } else {
+                response.setMetadata("Not Found", "404", "Category not found");
+                return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+            }
+        } catch (Exception e){
+            response.setMetadata("Error", "500", "Error querying by id: " + e.getMessage() );
+            e.getStackTrace();
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }

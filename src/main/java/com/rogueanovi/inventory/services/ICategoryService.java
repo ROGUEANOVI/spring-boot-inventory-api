@@ -8,5 +8,6 @@ public interface ICategoryService {
     ResponseEntity<CategoryResponseDto> searchAllCategories();
     ResponseEntity<CategoryResponseDto> searchCategoryById(Long id);
     ResponseEntity<CategoryResponseDto> addCategory(Category category);
-
+    ResponseEntity<CategoryResponseDto> editCategory(Long id, Category category);
+    ResponseEntity<CategoryResponseDto> deleteCategory(Long id);
 }

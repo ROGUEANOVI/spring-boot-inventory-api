@@ -1,6 +1,7 @@
 package com.rogueanovi.inventory.controller;
 
 import com.rogueanovi.inventory.dto.AddCategoryDto;
+import com.rogueanovi.inventory.dto.EditCategoryDto;
 import com.rogueanovi.inventory.model.Category;
 import com.rogueanovi.inventory.response.dto.CategoryResponseDto;
 import com.rogueanovi.inventory.services.ICategoryService;
@@ -35,7 +36,7 @@ public class CategoryController {
     }
 
     /**
-     * Get category by id
+     * Add category
      * @param categoryDto
      * @return
      */
@@ -46,5 +47,30 @@ public class CategoryController {
         category.setDescription(categoryDto.getDescription());
 
         return categoryService.addCategory(category);
+    }
+
+    /**
+     * Edit category
+     * @param id
+     * @param categoryDto
+     * @return
+     */
+    @PutMapping("/{id}")
+    public ResponseEntity<CategoryResponseDto> editCategory(@PathVariable("id") Long id, @RequestBody EditCategoryDto categoryDto){
+        Category category = new Category();
+        category.setName(categoryDto.getName());
+        category.setDescription(categoryDto.getDescription());
+
+        return categoryService.editCategory(id, category);
+    }
+
+    /**
+     *
+     * @param id
+     * @return
+     */
+    @DeleteMapping("{id}")
+    public ResponseEntity<CategoryResponseDto> deleteCategory(@PathVariable("id") Long id){
+        return categoryService.deleteCategory(id);
     }
 }

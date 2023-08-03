@@ -12,10 +12,13 @@ import java.io.Serializable;
 public class Category implements Serializable {
     @Serial
     private static final long serialVersionUID = -5026278002579616431L;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private String name;
+
     private String description;
 }
 

@@ -26,7 +26,7 @@ public class CategoryServiceImpl implements ICategoryService {
             response.getCategoryResponseDto().setCategories(categories);
             response.setMetadata("Ok", "200", "Successful Query");
         } catch (Exception e){
-            response.setMetadata("Error", "500", "Error when consulting the categories");
+            response.setMetadata("Error", "500", "Error when consulting the categories: " + e.getMessage());
             e.getStackTrace();
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 
@@ -50,10 +50,28 @@ public class CategoryServiceImpl implements ICategoryService {
                 return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
             }
         } catch (Exception e){
-            response.setMetadata("Error", "500", "Error querying by id");
+            response.setMetadata("Error", "500", "Error querying by id: " + e.getMessage() );
             e.getStackTrace();
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
         return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @Override
+    @Transactional
+    public ResponseEntity<CategoryResponseDto> addCategory(Category category) {
+        CategoryResponseDto response = new CategoryResponseDto();
+        List<Category> categories = new ArrayList<>();
+        try{
+            Category categorySaved = categoryDao.save(category);
+            categories.add(categorySaved);
+            response.getCategoryResponseDto().setCategories(categories);
+            response.setMetadata("Ok", "201", "Successful Query");
+        } catch (Exception e){
+            response.setMetadata("Error", "500", "Error saving category :" + e.getMessage());
+            e.getStackTrace();
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 }

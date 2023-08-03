@@ -1,8 +1,10 @@
 package com.rogueanovi.inventory.services;
 
-import com.rogueanovi.inventory.response.CategoryResponseRest;
+import com.rogueanovi.inventory.response.dto.CategoryResponseDto;
 import org.springframework.http.ResponseEntity;
 
 public interface ICategoryService {
-    ResponseEntity<CategoryResponseRest> search();
+    ResponseEntity<CategoryResponseDto> searchAllCategories();
+    ResponseEntity<CategoryResponseDto> searchCategoryById(Long id);
+
 }

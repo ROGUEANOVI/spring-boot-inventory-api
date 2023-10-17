@@ -22,8 +22,8 @@ public class CategoryController {
      * @return
      */
     @GetMapping()
-    public ResponseEntity<CategoryResponseDto> searchAllCategories (){
-        return categoryService.searchAllCategories();
+    public ResponseEntity<CategoryResponseDto> getAllCategories (){
+        return categoryService.findAllCategories();
     }
 
     /**
@@ -32,8 +32,8 @@ public class CategoryController {
      * @return
      */
     @GetMapping("/{id}")
-    public ResponseEntity<CategoryResponseDto> searchCategoryById(@PathVariable("id") Long id){
-        return categoryService.searchCategoryById(id);
+    public ResponseEntity<CategoryResponseDto> getCategoryById(@PathVariable("id") Long id){
+        return categoryService.findCategoryById(id);
     }
 
     /**
@@ -42,22 +42,22 @@ public class CategoryController {
      * @return
      */
     @PostMapping()
-    public ResponseEntity<CategoryResponseDto> addCategory(@RequestBody AddCategoryDto categoryDto){
+    public ResponseEntity<CategoryResponseDto> createCategory(@RequestBody AddCategoryDto categoryDto){
         Category category = new Category();
         category.setName(categoryDto.getName());
         category.setDescription(categoryDto.getDescription());
 
-        return categoryService.addCategory(category);
+        return categoryService.createCategory(category);
     }
 
     /**
-     * Edit category
+     * Update category
      * @param id
      * @param categoryDto
      * @return
      */
     @PutMapping("/{id}")
-    public ResponseEntity<CategoryResponseDto> editCategory(@PathVariable("id") Long id, @RequestBody EditCategoryDto categoryDto){
+    public ResponseEntity<CategoryResponseDto> updateCategory(@PathVariable("id") Long id, @RequestBody EditCategoryDto categoryDto){
         Category category = new Category();
         category.setName(categoryDto.getName());
         category.setDescription(categoryDto.getDescription());

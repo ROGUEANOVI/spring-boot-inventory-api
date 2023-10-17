@@ -1,8 +1,11 @@
-package com.rogueanovi.inventory.services;
+package com.rogueanovi.inventory.services.impl;
 
 import com.rogueanovi.inventory.dao.ICategoryDao;
+import com.rogueanovi.inventory.repository.ICategoryRepository;
 import com.rogueanovi.inventory.model.Category;
 import com.rogueanovi.inventory.response.dto.CategoryResponseDto;
+import com.rogueanovi.inventory.services.ICategoryService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,16 +16,18 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+@RequiredArgsConstructor
 @Service
 public class CategoryServiceImpl implements ICategoryService {
-    @Autowired
-    private ICategoryDao categoryDao;
+
+    private final ICategoryDao categoryDao;
+
     @Override
     @Transactional(readOnly = true)
-    public ResponseEntity<CategoryResponseDto> searchAllCategories() {
+    public ResponseEntity<CategoryResponseDto> findAllCategories() {
         CategoryResponseDto response = new CategoryResponseDto();
         try {
-            List<Category> categories = (List<Category>) categoryDao.findAll();
+            List<Category> categories = categoryDao.findAllCategories();
             response.getCategoryResponseDto().setCategories(categories);
             response.setMetadata("Ok", "200", "Successful Query");
         } catch (Exception e){
@@ -36,11 +41,11 @@ public class CategoryServiceImpl implements ICategoryService {
 
     @Override
     @Transactional(readOnly = true)
-    public ResponseEntity<CategoryResponseDto> searchCategoryById(Long id) {
+    public ResponseEntity<CategoryResponseDto> findCategoryById(Long id) {
         CategoryResponseDto response = new CategoryResponseDto();
         List<Category> categories = new ArrayList<>();
         try {
-            Optional<Category> searchedCategory = categoryDao.findById(id);
+            Optional<Category> searchedCategory = categoryDao.findCategoryById(id);
             if (searchedCategory.isPresent()){
                 categories.add(searchedCategory.get());
                 response.getCategoryResponseDto().setCategories(categories);
@@ -59,11 +64,11 @@ public class CategoryServiceImpl implements ICategoryService {
 
     @Override
     @Transactional
-    public ResponseEntity<CategoryResponseDto> addCategory(Category category) {
+    public ResponseEntity<CategoryResponseDto> createCategory(Category category) {
         CategoryResponseDto response = new CategoryResponseDto();
         List<Category> categories = new ArrayList<>();
         try{
-            Category categorySaved = categoryDao.save(category);
+            Category categorySaved = categoryDao.saveCategory(category);
             categories.add(categorySaved);
             response.getCategoryResponseDto().setCategories(categories);
             response.setMetadata("Ok", "201", "Successful Query");
@@ -81,12 +86,12 @@ public class CategoryServiceImpl implements ICategoryService {
         CategoryResponseDto response = new CategoryResponseDto();
         List<Category> categories = new ArrayList<>();
         try{
-            Optional<Category> searchedCategory = categoryDao.findById(id);
+            Optional<Category> searchedCategory = categoryDao.findCategoryById(id);
             if (searchedCategory.isPresent()){
                 searchedCategory.get().setName(category.getName());
                 searchedCategory.get().setDescription(category.getDescription());
 
-                Category updatedCategory = categoryDao.save(searchedCategory.get());
+                Category updatedCategory = categoryDao.saveCategory(searchedCategory.get());
 
                 categories.add(updatedCategory);
                 response.getCategoryResponseDto().setCategories(categories);
@@ -109,9 +114,9 @@ public class CategoryServiceImpl implements ICategoryService {
     public ResponseEntity<CategoryResponseDto> deleteCategory(Long id) {
         CategoryResponseDto response = new CategoryResponseDto();
         try {
-            Optional<Category> searchedCategory = categoryDao.findById(id);
+            Optional<Category> searchedCategory = categoryDao.findCategoryById(id);
             if (searchedCategory.isPresent()){
-                categoryDao.deleteById(id);
+                categoryDao.deleteCategoryById(id);
                 response.setMetadata("Ok", "200", "Successful delete");
             } else {
                 response.setMetadata("Not Found", "404", "Category not found");

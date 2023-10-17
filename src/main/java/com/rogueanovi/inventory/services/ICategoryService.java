@@ -5,9 +5,9 @@ import com.rogueanovi.inventory.response.dto.CategoryResponseDto;
 import org.springframework.http.ResponseEntity;
 
 public interface ICategoryService {
-    ResponseEntity<CategoryResponseDto> searchAllCategories();
-    ResponseEntity<CategoryResponseDto> searchCategoryById(Long id);
-    ResponseEntity<CategoryResponseDto> addCategory(Category category);
+    ResponseEntity<CategoryResponseDto> findAllCategories();
+    ResponseEntity<CategoryResponseDto> findCategoryById(Long id);
+    ResponseEntity<CategoryResponseDto> createCategory(Category category);
     ResponseEntity<CategoryResponseDto> editCategory(Long id, Category category);
     ResponseEntity<CategoryResponseDto> deleteCategory(Long id);
 }

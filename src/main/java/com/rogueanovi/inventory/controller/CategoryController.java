@@ -21,7 +21,7 @@ public class CategoryController {
      * Get all categories
      * @return
      */
-    @GetMapping()
+    @GetMapping
     public ResponseEntity<CategoryResponseDto> getAllCategories (){
         return categoryService.findAllCategories();
     }
@@ -41,7 +41,7 @@ public class CategoryController {
      * @param categoryDto
      * @return
      */
-    @PostMapping()
+    @PostMapping
     public ResponseEntity<CategoryResponseDto> createCategory(@RequestBody AddCategoryDto categoryDto){
         Category category = new Category();
         category.setName(categoryDto.getName());

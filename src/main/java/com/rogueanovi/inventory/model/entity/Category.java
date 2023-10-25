@@ -1,4 +1,4 @@
-package com.rogueanovi.inventory.model;
+package com.rogueanovi.inventory.model.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -16,6 +16,7 @@ import java.io.Serializable;
 @Entity
 @Table(name = "category")
 public class Category implements Serializable {
+
     @Serial
     private static final long serialVersionUID = -5026278002579616431L;
 

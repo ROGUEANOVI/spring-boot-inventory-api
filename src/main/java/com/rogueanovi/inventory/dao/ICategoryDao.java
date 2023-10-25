@@ -1,6 +1,7 @@
 package com.rogueanovi.inventory.dao;
 
-import com.rogueanovi.inventory.model.Category;
+import com.rogueanovi.inventory.model.entity.Category;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;

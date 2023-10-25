@@ -1,13 +1,13 @@
 package com.rogueanovi.inventory.services;
 
-import com.rogueanovi.inventory.model.Category;
-import com.rogueanovi.inventory.response.dto.CategoryResponseDto;
+import com.rogueanovi.inventory.model.dto.response.ApiBaseResponse;
+import com.rogueanovi.inventory.model.entity.Category;
 import org.springframework.http.ResponseEntity;
 
 public interface ICategoryService {
-    ResponseEntity<CategoryResponseDto> findAllCategories();
-    ResponseEntity<CategoryResponseDto> findCategoryById(Long id);
-    ResponseEntity<CategoryResponseDto> createCategory(Category category);
-    ResponseEntity<CategoryResponseDto> editCategory(Long id, Category category);
-    ResponseEntity<CategoryResponseDto> deleteCategory(Long id);
+    ResponseEntity<ApiBaseResponse> findAllCategories();
+    ResponseEntity<ApiBaseResponse> findCategoryById(Long id);
+    ResponseEntity<ApiBaseResponse> createCategory(Category category);
+    ResponseEntity<ApiBaseResponse> editCategory(Long id, Category category);
+    ResponseEntity<ApiBaseResponse> deleteCategory(Long id);
 }

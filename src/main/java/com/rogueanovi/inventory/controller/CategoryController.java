@@ -1,11 +1,10 @@
 package com.rogueanovi.inventory.controller;
 
-import com.rogueanovi.inventory.dto.AddCategoryDto;
-import com.rogueanovi.inventory.dto.EditCategoryDto;
-import com.rogueanovi.inventory.model.Category;
-import com.rogueanovi.inventory.response.dto.CategoryResponseDto;
+import com.rogueanovi.inventory.model.dto.request.AddCategoryDto;
+import com.rogueanovi.inventory.model.dto.request.EditCategoryDto;
+import com.rogueanovi.inventory.model.dto.response.ApiBaseResponse;
+import com.rogueanovi.inventory.model.entity.Category;
 import com.rogueanovi.inventory.services.ICategoryService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,35 +13,39 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping(value = "/api/v1/category")
 @CrossOrigin(origins = {"http://localhost:4200"})
 public class CategoryController {
-    @Autowired
-    private ICategoryService categoryService;
+    private final ICategoryService categoryService;
 
-    /**
-     * Get all categories
-     * @return
-     */
-    @GetMapping
-    public ResponseEntity<CategoryResponseDto> getAllCategories (){
-        return categoryService.findAllCategories();
+    public CategoryController(ICategoryService categoryService) {
+        this.categoryService = categoryService;
     }
 
     /**
-     * Get category by id
+     * Get Categories
+     * @return ResponseEntity
+     */
+    @GetMapping
+    public ResponseEntity<ApiBaseResponse> getAllCategories (){
+        return categoryService.findAllCategories();
+    }
+
+
+    /**
+     * Get Category by Id
      * @param id
-     * @return
+     * @return ResponseEntity
      */
     @GetMapping("/{id}")
-    public ResponseEntity<CategoryResponseDto> getCategoryById(@PathVariable("id") Long id){
+    public ResponseEntity<ApiBaseResponse> getCategoryById(@PathVariable("id") Long id){
         return categoryService.findCategoryById(id);
     }
 
     /**
-     * Add category
+     * Create Category
      * @param categoryDto
-     * @return
+     * @return ResponseEntity
      */
     @PostMapping
-    public ResponseEntity<CategoryResponseDto> createCategory(@RequestBody AddCategoryDto categoryDto){
+    public ResponseEntity<ApiBaseResponse> createCategory(@RequestBody AddCategoryDto categoryDto){
         Category category = new Category();
         category.setName(categoryDto.getName());
         category.setDescription(categoryDto.getDescription());
@@ -51,13 +54,13 @@ public class CategoryController {
     }
 
     /**
-     * Update category
+     * Update Category
      * @param id
      * @param categoryDto
-     * @return
+     * @return ResponseEntity
      */
     @PutMapping("/{id}")
-    public ResponseEntity<CategoryResponseDto> updateCategory(@PathVariable("id") Long id, @RequestBody EditCategoryDto categoryDto){
+    public ResponseEntity<ApiBaseResponse> updateCategory(@PathVariable("id") Long id, @RequestBody EditCategoryDto categoryDto){
         Category category = new Category();
         category.setName(categoryDto.getName());
         category.setDescription(categoryDto.getDescription());
@@ -66,12 +69,12 @@ public class CategoryController {
     }
 
     /**
-     *
+     * Delete Category
      * @param id
-     * @return
+     * @return ResponseEntity
      */
     @DeleteMapping("{id}")
-    public ResponseEntity<CategoryResponseDto> deleteCategory(@PathVariable("id") Long id){
+    public ResponseEntity<ApiBaseResponse> deleteCategory(@PathVariable("id") Long id){
         return categoryService.deleteCategory(id);
     }
 }

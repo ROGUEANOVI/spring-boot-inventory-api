@@ -1,37 +1,45 @@
 package com.rogueanovi.inventory.services.impl;
 
 import com.rogueanovi.inventory.dao.ICategoryDao;
-import com.rogueanovi.inventory.repository.ICategoryRepository;
-import com.rogueanovi.inventory.model.Category;
-import com.rogueanovi.inventory.response.dto.CategoryResponseDto;
+import com.rogueanovi.inventory.model.dto.response.ApiBaseResponse;
+import com.rogueanovi.inventory.model.entity.Category;
+import com.rogueanovi.inventory.model.dto.response.CategoryDto;
 import com.rogueanovi.inventory.services.ICategoryService;
-import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
-@RequiredArgsConstructor
 @Service
 public class CategoryServiceImpl implements ICategoryService {
 
     private final ICategoryDao categoryDao;
 
+    public CategoryServiceImpl(ICategoryDao categoryDao) {
+        this.categoryDao = categoryDao;
+    }
+
     @Override
     @Transactional(readOnly = true)
-    public ResponseEntity<CategoryResponseDto> findAllCategories() {
-        CategoryResponseDto response = new CategoryResponseDto();
+    public ResponseEntity<ApiBaseResponse> findAllCategories() {
+        ApiBaseResponse response = new ApiBaseResponse();
         try {
-            List<Category> categories = categoryDao.findAllCategories();
-            response.getCategoryResponseDto().setCategories(categories);
-            response.setMetadata("Ok", "200", "Successful Query");
+            List<Category> categoriesEntity = categoryDao.findAllCategories();
+            var categories = categoriesEntity.stream().map(categoryEntity -> CategoryDto.builder()
+                    .id(categoryEntity.getId())
+                    .name(categoryEntity.getName())
+                    .description(categoryEntity.getDescription())
+                    .build())
+                    .collect(Collectors.toList());
+
+            response.setData(categories);
+            response.setMetadata("200", "Ok", "Successful Query");
         } catch (Exception e){
-            response.setMetadata("Error", "500", "Error when consulting the categories: " + e.getMessage());
+            response.setMetadata("500", "Internal Server Error", "Error when consulting the categories: " + e.getMessage());
             e.getStackTrace();
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 
@@ -41,21 +49,26 @@ public class CategoryServiceImpl implements ICategoryService {
 
     @Override
     @Transactional(readOnly = true)
-    public ResponseEntity<CategoryResponseDto> findCategoryById(Long id) {
-        CategoryResponseDto response = new CategoryResponseDto();
-        List<Category> categories = new ArrayList<>();
+    public ResponseEntity<ApiBaseResponse> findCategoryById(Long id) {
+        ApiBaseResponse response = new ApiBaseResponse();
         try {
-            Optional<Category> searchedCategory = categoryDao.findCategoryById(id);
-            if (searchedCategory.isPresent()){
-                categories.add(searchedCategory.get());
-                response.getCategoryResponseDto().setCategories(categories);
-                response.setMetadata("Ok", "200", "Successful Query");
+            Optional<Category> categoryEntity = categoryDao.findCategoryById(id);
+            if (categoryEntity.isPresent()){
+                var categoryDto = CategoryDto
+                        .builder()
+                        .id(categoryEntity.get().getId())
+                        .name(categoryEntity.get().getName())
+                        .description(categoryEntity.get().getDescription())
+                        .build();
+
+                response.setData(categoryDto);
+                response.setMetadata("200", "Ok", "Successful Query");
             } else {
-                response.setMetadata("Not Found", "404", "Category not found");
+                response.setMetadata("404", "Not Found", "Category not found");
                 return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
             }
         } catch (Exception e){
-            response.setMetadata("Error", "500", "Error querying by id: " + e.getMessage() );
+            response.setMetadata("500", "Internal Server Error", "Error querying by id: " + e.getMessage() );
             e.getStackTrace();
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -64,16 +77,22 @@ public class CategoryServiceImpl implements ICategoryService {
 
     @Override
     @Transactional
-    public ResponseEntity<CategoryResponseDto> createCategory(Category category) {
-        CategoryResponseDto response = new CategoryResponseDto();
-        List<Category> categories = new ArrayList<>();
+    public ResponseEntity<ApiBaseResponse> createCategory(Category category) {
+        ApiBaseResponse response = new ApiBaseResponse();
         try{
-            Category categorySaved = categoryDao.saveCategory(category);
-            categories.add(categorySaved);
-            response.getCategoryResponseDto().setCategories(categories);
-            response.setMetadata("Ok", "201", "Successful Query");
+            Category categoryEntity = categoryDao.saveCategory(category);
+
+            var categoryDto = CategoryDto
+                    .builder()
+                    .id(categoryEntity.getId())
+                    .name(categoryEntity.getName())
+                    .description(categoryEntity.getDescription())
+                    .build();
+
+            response.setData(categoryDto);
+            response.setMetadata("201", "Created", "Successful Query");
         } catch (Exception e){
-            response.setMetadata("Error", "500", "Error saving category :" + e.getMessage());
+            response.setMetadata("500", "Internal Server Error", "Error saving category: " + e.getMessage());
             e.getStackTrace();
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -82,27 +101,31 @@ public class CategoryServiceImpl implements ICategoryService {
 
     @Override
     @Transactional
-    public ResponseEntity<CategoryResponseDto> editCategory(Long id, Category category) {
-        CategoryResponseDto response = new CategoryResponseDto();
-        List<Category> categories = new ArrayList<>();
+    public ResponseEntity<ApiBaseResponse> editCategory(Long id, Category category) {
+        ApiBaseResponse response = new ApiBaseResponse();
         try{
-            Optional<Category> searchedCategory = categoryDao.findCategoryById(id);
-            if (searchedCategory.isPresent()){
-                searchedCategory.get().setName(category.getName());
-                searchedCategory.get().setDescription(category.getDescription());
+            Optional<Category> categoryEntity = categoryDao.findCategoryById(id);
+            if (categoryEntity.isPresent()){
+                categoryEntity.get().setName(category.getName());
+                categoryEntity.get().setDescription(category.getDescription());
 
-                Category updatedCategory = categoryDao.saveCategory(searchedCategory.get());
+                Category updatedCategory = categoryDao.saveCategory(categoryEntity.get());
 
-                categories.add(updatedCategory);
-                response.getCategoryResponseDto().setCategories(categories);
-                response.setMetadata("Ok", "200", "Successful Update");
+                var categoryDto = CategoryDto.builder()
+                    .id(updatedCategory.getId())
+                    .name(updatedCategory.getName())
+                    .description(updatedCategory.getDescription())
+                    .build();
+
+                response.setData(categoryDto);
+                response.setMetadata("200", "Ok", "Successful Update");
             } else {
-                response.setMetadata("Not Found", "404", "Category not found");
+                response.setMetadata("404", "Not Found", "Category not found");
                 return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
             }
 
         } catch (Exception e){
-            response.setMetadata("Error", "500", "Error updating category :" + e.getMessage());
+            response.setMetadata("500", "Internal Server Error", "Error updating category :" + e.getMessage());
             e.getStackTrace();
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -111,19 +134,19 @@ public class CategoryServiceImpl implements ICategoryService {
 
     @Override
     @Transactional
-    public ResponseEntity<CategoryResponseDto> deleteCategory(Long id) {
-        CategoryResponseDto response = new CategoryResponseDto();
+    public ResponseEntity<ApiBaseResponse> deleteCategory(Long id) {
+        ApiBaseResponse response = new ApiBaseResponse();
         try {
-            Optional<Category> searchedCategory = categoryDao.findCategoryById(id);
-            if (searchedCategory.isPresent()){
+            Optional<Category> categoryEntity = categoryDao.findCategoryById(id);
+            if (categoryEntity.isPresent()){
                 categoryDao.deleteCategoryById(id);
-                response.setMetadata("Ok", "200", "Successful delete");
+                response.setMetadata("200", "Ok", "Successful delete");
             } else {
-                response.setMetadata("Not Found", "404", "Category not found");
+                response.setMetadata("404", "Not Found", "Category not found");
                 return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
             }
         } catch (Exception e){
-            response.setMetadata("Error", "500", "Error querying by id: " + e.getMessage() );
+            response.setMetadata("500", "Internal Server Error", "Error querying by id: " + e.getMessage() );
             e.getStackTrace();
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
